@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PUL•AU Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --orange:#FF5A1F; --orange-tint:#FFF1E8; --charcoal:#1A1A18;
+    --gray-700:#4A4844; --gray-500:#837F78; --gray-200:#E8E5DE; --gray-100:#F5F3EE;
+    --paper:#FFFFFF; --green:#1F8A4C; --green-tint:#E9F6EE; --blue:#2563A8; --blue-tint:#EAF1F9;
+    --font-display:'Space Grotesk',sans-serif; --font-body:'Inter',sans-serif; --font-mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:var(--font-body); color:var(--charcoal); background:var(--gray-100);}
+  .screen{display:none;}
+  .screen.active{display:block;}
+
+  /* Login */
+  #screen-login{min-height:100vh; display:none; align-items:center; justify-content:center;}
+  #screen-login.active{display:flex;}
+  .login-card{background:var(--paper); border:1px solid var(--gray-200); border-radius:16px; padding:36px; width:100%; max-width:380px;}
+  .login-logo{font-family:var(--font-display); font-weight:700; font-size:22px; margin-bottom:4px;}
+  .login-logo .dot{color:var(--orange);}
+  .login-sub{font-size:13px; color:var(--gray-500); margin-bottom:24px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-size:11px; font-weight:600; color:var(--gray-700); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.03em;}
+  .field input, .field select{width:100%; padding:11px 12px; border:1px solid var(--gray-200); border-radius:8px; font-size:14px; font-family:var(--font-body);}
+  .field input:focus, .field select:focus{outline:2px solid var(--orange); outline-offset:1px; border-color:var(--orange);}
+  .btn{padding:12px; border:none; border-radius:8px; font-weight:600; font-size:14px; cursor:pointer; font-family:var(--font-body);}
+  .btn.primary{background:var(--orange); color:#fff; width:100%;}
+  .btn.primary:hover{background:#E5490F;}
+  .btn-sm{padding:8px 14px; font-size:13px; border-radius:6px;}
+  .btn-outline{background:transparent; border:1px solid var(--gray-200); color:var(--charcoal);}
+  .btn-outline:hover{border-color:var(--charcoal);}
+  .error-box{margin-top:12px; padding:11px 13px; background:#FDEAE5; border:1px solid #F5C4B5; border-radius:8px; font-size:13px; color:#B23A15; display:none;}
+  .error-box.show{display:block;}
+
+  /* Dashboard shell */
+  #screen-dashboard{display:none;}
+  .topbar{background:var(--paper); border-bottom:1px solid var(--gray-200); padding:0 24px; display:flex; align-items:center; justify-content:space-between; height:64px; position:sticky; top:0; z-index:10;}
+  .logo{font-family:var(--font-display); font-weight:700; font-size:18px;}
+  .logo .dot{color:var(--orange);}
+  .logo-sub{font-size:11px; color:var(--gray-500); font-family:var(--font-mono); margin-left:8px;}
+  .wrap{max-width:1200px; margin:0 auto; padding:28px 24px;}
+
+  .tabbar{display:flex; gap:4px; margin-bottom:24px; background:var(--gray-100); padding:4px; border-radius:10px; width:fit-content;}
+  .tabbar .tab{padding:9px 16px; border-radius:7px; font-size:13px; font-weight:600; color:var(--gray-700); cursor:pointer;}
+  .tabbar .tab.active{background:var(--paper); box-shadow:0 1px 3px rgba(0,0,0,0.08);}
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  /* Stat cards */
+  .stat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:28px;}
+  .stat-card{background:var(--paper); border:1px solid var(--gray-200); border-radius:14px; padding:18px;}
+  .stat-card .label{font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--gray-500); margin-bottom:8px;}
+  .stat-card .value{font-family:var(--font-display); font-size:28px; font-weight:700;}
+  .stat-card .value.orange{color:var(--orange);}
+
+  /* Table */
+  .card{background:var(--paper); border:1px solid var(--gray-200); border-radius:14px; padding:20px; margin-bottom:20px;}
+  .card-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; gap:10px; flex-wrap:wrap;}
+  .card-head h3{font-family:var(--font-display); font-size:16px;}
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  th{text-align:left; padding:9px 10px; color:var(--gray-500); font-weight:600; text-transform:uppercase; font-size:10px; letter-spacing:0.04em; border-bottom:1px solid var(--gray-200);}
+  td{padding:10px; border-bottom:1px solid var(--gray-100); vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  .mono{font-family:var(--font-mono); font-size:12px;}
+  .pill{font-size:10px; font-weight:700; padding:3px 8px; border-radius:5px; background:var(--gray-100); color:var(--gray-700); text-transform:uppercase;}
+  .pill.delivered{background:var(--green-tint); color:var(--green);}
+  .pill.in_transit, .pill.out_for_delivery{background:var(--blue-tint); color:var(--blue);}
+  .filter-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .filter-row input, .filter-row select{padding:8px 10px; border:1px solid var(--gray-200); border-radius:6px; font-size:13px;}
+
+  .form-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-bottom:12px;}
+  .empty-state{text-align:center; padding:40px; color:var(--gray-500); font-size:13px;}
+  .toast{position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--charcoal); color:#fff; padding:11px 18px; border-radius:24px; font-size:13px; font-weight:600; opacity:0; pointer-events:none; transition:opacity .2s; z-index:100;}
+  .toast.show{opacity:1;}
+  .icon-btn{background:none; border:none; cursor:pointer; color:var(--gray-500); font-size:13px;}
+  .icon-btn:hover{color:#B23A15;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="screen active" id="screen-login">
+  <div class="login-card">
+    <div class="login-logo">PUL<span class="dot">•</span>AU <span style="font-size:13px; font-weight:500; color:var(--gray-500);">Admin</span></div>
+    <div class="login-sub">Masuk dengan akun admin</div>
+    <div class="field"><label>Email</label><input id="loginEmail" type="email" placeholder="admin@contoh.com"></div>
+    <div class="field"><label>Password</label><input id="loginPassword" type="password" placeholder="••••••••"></div>
+    <button class="btn primary" id="btnLogin">Masuk</button>
+    <div class="error-box" id="loginError"></div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="screen" id="screen-dashboard">
+  <div class="topbar">
+    <div><span class="logo">PUL<span class="dot">•</span>AU</span><span class="logo-sub">ADMIN</span></div>
+    <button class="btn-outline btn btn-sm" id="btnLogout">Keluar</button>
+  </div>
+
+  <div class="wrap">
+    <div class="stat-grid">
+      <div class="stat-card"><div class="label">Paket Hari Ini</div><div class="value" id="statToday">-</div></div>
+      <div class="stat-card"><div class="label">Sedang Berjalan</div><div class="value orange" id="statTransit">-</div></div>
+      <div class="stat-card"><div class="label">Berhasil Diterima</div><div class="value" id="statDelivered">-</div></div>
+      <div class="stat-card"><div class="label">Total Pendapatan</div><div class="value" id="statRevenue">-</div></div>
+    </div>
+
+    <div class="tabbar">
+      <div class="tab active" data-tab="shipments">Semua Paket</div>
+      <div class="tab" data-tab="tariffs">Tarif</div>
+      <div class="tab" data-tab="regions">Wilayah</div>
+    </div>
+
+    <!-- PANEL: SHIPMENTS -->
+    <div class="panel active" id="panel-shipments">
+      <div class="card">
+        <div class="card-head">
+          <h3>Monitoring Paket</h3>
+          <div class="filter-row">
+            <input id="filterResi" placeholder="Cari nomor resi...">
+            <select id="filterStatus">
+              <option value="">Semua status</option>
+              <option value="created">Dibuat</option>
+              <option value="picked_up">Dijemput</option>
+              <option value="at_origin_hub">Di Hub Asal</option>
+              <option value="in_transit">Transit</option>
+              <option value="at_destination_hub">Di Hub Tujuan</option>
+              <option value="out_for_delivery">Diantar</option>
+              <option value="delivered">Diterima</option>
+              <option value="cancelled">Dibatalkan</option>
+              <option value="returned">Dikembalikan</option>
+            </select>
+            <button class="btn btn-outline btn-sm" id="btnFilterShipments">Cari</button>
+          </div>
+        </div>
+        <div id="shipmentsTableWrap"><div class="empty-state">Memuat...</div></div>
+      </div>
+    </div>
+
+    <!-- PANEL: TARIFFS -->
+    <div class="panel" id="panel-tariffs">
+      <div class="card">
+        <div class="card-head"><h3>Tambah / Update Tarif</h3></div>
+        <div class="form-grid">
+          <input id="tariffOriginZone" placeholder="Zona asal (mis. jawa)">
+          <input id="tariffDestZone" placeholder="Zona tujuan (mis. bali_nusa)">
+          <select id="tariffService">
+            <option value="regular">Regular</option>
+            <option value="express">Express</option>
+            <option value="same_day">Same Day</option>
+            <option value="cargo">Cargo</option>
+          </select>
+          <input id="tariffBasePrice" type="number" placeholder="Harga dasar (Rp)">
+          <input id="tariffPerKg" type="number" placeholder="Harga/kg (Rp)">
+          <input id="tariffDaysMin" type="number" placeholder="Estimasi min (hari)">
+          <input id="tariffDaysMax" type="number" placeholder="Estimasi max (hari)">
+        </div>
+        <button class="btn primary btn-sm" id="btnSaveTariff" style="width:auto;">Simpan Tarif</button>
+        <div class="error-box" id="tariffError"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Daftar Tarif</h3></div>
+        <div id="tariffsTableWrap"><div class="empty-state">Memuat...</div></div>
+      </div>
+    </div>
+
+    <!-- PANEL: REGIONS -->
+    <div class="panel" id="panel-regions">
+      <div class="card">
+        <div class="card-head"><h3>Tambah Provinsi</h3></div>
+        <div class="form-grid">
+          <input id="provName" placeholder="Nama provinsi">
+          <input id="provZone" placeholder="Zona pulau (mis. sumatera)">
+        </div>
+        <button class="btn primary btn-sm" id="btnAddProvince" style="width:auto;">Tambah Provinsi</button>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Tambah Kota</h3></div>
+        <div class="form-grid">
+          <select id="cityProvince"><option value="">Pilih provinsi...</option></select>
+          <input id="cityName" placeholder="Nama kota">
+          <label style="display:flex; align-items:center; gap:6px; font-size:13px;"><input type="checkbox" id="cityIsHub" style="width:auto;"> Kota ini hub distribusi</label>
+        </div>
+        <button class="btn primary btn-sm" id="btnAddCity" style="width:auto;">Tambah Kota</button>
+        <div class="error-box" id="regionError"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Daftar Provinsi & Kota</h3></div>
+        <div id="regionsTableWrap"><div class="empty-state">Memuat...</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let API_BASE = localStorage.getItem('pulau_api_base') || 'https://pulau.onrender.com/api';
+  let authToken = localStorage.getItem('pulau_admin_token') || null;
+
+  const statusLabels = {
+    created:'Dibuat', picked_up:'Dijemput', at_origin_hub:'Di Hub Asal', in_transit:'Transit',
+    at_destination_hub:'Di Hub Tujuan', out_for_delivery:'Diantar', delivered:'Diterima',
+    cancelled:'Dibatalkan', returned:'Dikembalikan',
+  };
+
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 2500);
+  }
+
+  async function apiFetch(path, options = {}) {
+    const res = await fetch(API_BASE + path, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authToken ? { Authorization: 'Bearer ' + authToken } : {}),
+        ...(options.headers || {}),
+      },
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Terjadi kesalahan');
+    return data;
+  }
+
+  function formatRupiah(n){ return 'Rp' + Number(n).toLocaleString('id-ID'); }
+
+  // ---------- Auth ----------
+  document.getElementById('btnLogin').addEventListener('click', async () => {
+    const errEl = document.getElementById('loginError');
+    errEl.classList.remove('show');
+    try {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      const data = await apiFetch('/auth/login', { method:'POST', body: JSON.stringify({ email, password }) });
+      if (data.user.role !== 'admin') {
+        errEl.textContent = 'Akun ini bukan akun admin.';
+        errEl.classList.add('show');
+        return;
+      }
+      authToken = data.token;
+      localStorage.setItem('pulau_admin_token', authToken);
+      enterDashboard();
+    } catch (err) {
+      errEl.textContent = err.message;
+      errEl.classList.add('show');
+    }
+  });
+
+  document.getElementById('btnLogout').addEventListener('click', () => {
+    authToken = null;
+    localStorage.removeItem('pulau_admin_token');
+    document.getElementById('screen-dashboard').style.display = 'none';
+    document.getElementById('screen-login').classList.add('active');
+  });
+
+  async function enterDashboard(){
+    document.getElementById('screen-login').classList.remove('active');
+    document.getElementById('screen-dashboard').style.display = 'block';
+    await Promise.all([loadStats(), loadShipments(), loadTariffs(), loadRegions()]);
+  }
+
+  // ---------- Stats ----------
+  async function loadStats(){
+    try {
+      const s = await apiFetch('/admin/stats');
+      document.getElementById('statToday').textContent = s.totalToday;
+      const transit = (s.byStatus.in_transit||0) + (s.byStatus.picked_up||0) + (s.byStatus.out_for_delivery||0) + (s.byStatus.at_origin_hub||0) + (s.byStatus.at_destination_hub||0);
+      document.getElementById('statTransit').textContent = transit;
+      document.getElementById('statDelivered').textContent = s.byStatus.delivered || 0;
+      document.getElementById('statRevenue').textContent = formatRupiah(s.totalRevenue);
+    } catch (err) { showToast(err.message); }
+  }
+
+  // ---------- Shipments ----------
+  async function loadShipments(){
+    const wrap = document.getElementById('shipmentsTableWrap');
+    try {
+      const resi = document.getElementById('filterResi').value;
+      const status = document.getElementById('filterStatus').value;
+      const params = new URLSearchParams();
+      if (resi) params.set('resi', resi);
+      if (status) params.set('status', status);
+      const list = await apiFetch('/admin/shipments?' + params.toString());
+
+      if (list.length === 0) { wrap.innerHTML = '<div class="empty-state">Tidak ada paket ditemukan.</div>'; return; }
+
+      wrap.innerHTML = `<table><thead><tr>
+        <th>Resi</th><th>Rute</th><th>Layanan</th><th>Harga</th><th>Status</th><th>Dibuat</th>
+      </tr></thead><tbody>${list.map(s => `
+        <tr>
+          <td class="mono">${s.resi_number}</td>
+          <td>${s.origin_city_name} → ${s.destination_city_name}</td>
+          <td>${s.service_type}</td>
+          <td>${formatRupiah(s.price)}</td>
+          <td><span class="pill ${s.status}">${statusLabels[s.status]||s.status}</span></td>
+          <td>${new Date(s.created_at).toLocaleDateString('id-ID')}</td>
+        </tr>`).join('')}</tbody></table>`;
+    } catch (err) {
+      wrap.innerHTML = `<div class="empty-state">${err.message}</div>`;
+    }
+  }
+  document.getElementById('btnFilterShipments').addEventListener('click', loadShipments);
+
+  // ---------- Tariffs ----------
+  async function loadTariffs(){
+    const wrap = document.getElementById('tariffsTableWrap');
+    try {
+      const list = await apiFetch('/admin/tariffs');
+      if (list.length === 0) { wrap.innerHTML = '<div class="empty-state">Belum ada tarif.</div>'; return; }
+      wrap.innerHTML = `<table><thead><tr>
+        <th>Rute Zona</th><th>Layanan</th><th>Harga Dasar</th><th>Harga/kg</th><th>Estimasi</th><th></th>
+      </tr></thead><tbody>${list.map(t => `
+        <tr>
+          <td>${t.origin_zone} → ${t.destination_zone}</td>
+          <td>${t.service_type}</td>
+          <td>${formatRupiah(t.base_price)}</td>
+          <td>${formatRupiah(t.price_per_kg)}</td>
+          <td>${t.estimated_days_min}-${t.estimated_days_max} hari</td>
+          <td><button class="icon-btn" onclick="deleteTariff(${t.id})">Hapus</button></td>
+        </tr>`).join('')}</tbody></table>`;
+    } catch (err) {
+      wrap.innerHTML = `<div class="empty-state">${err.message}</div>`;
+    }
+  }
+
+  document.getElementById('btnSaveTariff').addEventListener('click', async () => {
+    const errEl = document.getElementById('tariffError');
+    errEl.classList.remove('show');
+    try {
+      const body = {
+        originZone: document.getElementById('tariffOriginZone').value.trim(),
+        destinationZone: document.getElementById('tariffDestZone').value.trim(),
+        serviceType: document.getElementById('tariffService').value,
+        basePrice: Number(document.getElementById('tariffBasePrice').value),
+        pricePerKg: Number(document.getElementById('tariffPerKg').value),
+        estimatedDaysMin: Number(document.getElementById('tariffDaysMin').value),
+        estimatedDaysMax: Number(document.getElementById('tariffDaysMax').value),
+      };
+      await apiFetch('/admin/tariffs', { method:'POST', body: JSON.stringify(body) });
+      showToast('Tarif disimpan');
+      loadTariffs();
+    } catch (err) {
+      errEl.textContent = err.message;
+      errEl.classList.add('show');
+    }
+  });
+
+  window.deleteTariff = async function(id){
+    try {
+      await apiFetch('/admin/tariffs/' + id, { method:'DELETE' });
+      showToast('Tarif dihapus');
+      loadTariffs();
+    } catch (err) { showToast(err.message); }
+  };
+
+  // ---------- Regions ----------
+  async function loadRegions(){
+    const wrap = document.getElementById('regionsTableWrap');
+    const provSelect = document.getElementById('cityProvince');
+    try {
+      const provinces = await apiFetch('/admin/provinces');
+      provSelect.innerHTML = '<option value="">Pilih provinsi...</option>' +
+        provinces.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+
+      const cities = await apiFetch('/cities'); // endpoint publik, sudah ada join province
+      wrap.innerHTML = `<table><thead><tr><th>Kota</th><th>Provinsi</th><th>Zona</th><th>Hub?</th></tr></thead><tbody>${
+        cities.map(c => `<tr><td>${c.name}</td><td>${c.province_name}</td><td>${c.island_zone}</td><td>${c.is_hub ? 'Ya' : '-'}</td></tr>`).join('')
+      }</tbody></table>`;
+    } catch (err) {
+      wrap.innerHTML = `<div class="empty-state">${err.message}</div>`;
+    }
+  }
+
+  document.getElementById('btnAddProvince').addEventListener('click', async () => {
+    try {
+      const name = document.getElementById('provName').value.trim();
+      const islandZone = document.getElementById('provZone').value.trim();
+      if (!name || !islandZone) { showToast('Isi nama & zona provinsi dulu'); return; }
+      await apiFetch('/admin/provinces', { method:'POST', body: JSON.stringify({ name, islandZone }) });
+      document.getElementById('provName').value = '';
+      document.getElementById('provZone').value = '';
+      showToast('Provinsi ditambahkan');
+      loadRegions();
+    } catch (err) { showToast(err.message); }
+  });
+
+  document.getElementById('btnAddCity').addEventListener('click', async () => {
+    const errEl = document.getElementById('regionError');
+    errEl.classList.remove('show');
+    try {
+      const provinceId = Number(document.getElementById('cityProvince').value);
+      const name = document.getElementById('cityName').value.trim();
+      const isHub = document.getElementById('cityIsHub').checked;
+      if (!provinceId || !name) { errEl.textContent = 'Pilih provinsi & isi nama kota'; errEl.classList.add('show'); return; }
+      await apiFetch('/admin/cities', { method:'POST', body: JSON.stringify({ provinceId, name, isHub }) });
+      document.getElementById('cityName').value = '';
+      showToast('Kota ditambahkan');
+      loadRegions();
+    } catch (err) {
+      errEl.textContent = err.message;
+      errEl.classList.add('show');
+    }
+  });
+
+  // ---------- Tabs ----------
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ---------- Init: auto-login kalau token tersimpan ----------
+  if (authToken) { enterDashboard(); }
+</script>
+</body>
+</html>

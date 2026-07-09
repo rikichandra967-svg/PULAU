@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PULAU — Ekspedisi Antar Pulau</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --orange: #FF5A1F;
+    --orange-tint: #FFF1E8;
+    --charcoal: #1A1A18;
+    --charcoal-soft: #232320;
+    --gray-700: #4A4844;
+    --gray-500: #837F78;
+    --gray-200: #E8E5DE;
+    --gray-100: #F5F3EE;
+    --paper: #FFFFFF;
+    --green: #1F8A4C;
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+    --shadow-sm: 0 1px 2px rgba(26,26,24,0.04);
+    --shadow-md: 0 8px 24px rgba(26,26,24,0.08);
+    --shadow-lg: 0 16px 40px rgba(26,26,24,0.12);
+  }
+  html{scroll-behavior:smooth;}
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family: var(--font-body);
+    color: var(--charcoal);
+    background: var(--paper);
+    line-height: 1.5;
+  }
+  a{color:inherit;}
+  .wrap{max-width: 1080px; margin: 0 auto; padding: 0 24px;}
+
+  /* ---------- Header ---------- */
+  header{
+    border-bottom: 1px solid var(--gray-200);
+    position: sticky; top:0; background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(6px); z-index: 50;
+  }
+  .header-inner{display:flex; align-items:center; justify-content:space-between; height:72px;}
+  .logo{font-family: var(--font-display); font-weight:700; font-size:22px; letter-spacing:-0.02em; display:flex; align-items:center; gap:2px;}
+  .logo .dot{color: var(--orange);}
+  nav{display:flex; gap:28px; font-size:14px; font-weight:500;}
+  nav a{text-decoration:none; color: var(--gray-700);}
+  nav a:hover{color: var(--charcoal);}
+  .api-toggle{
+    font-family: var(--font-mono); font-size:11px; color: var(--gray-500);
+    background: var(--gray-100); border:1px solid var(--gray-200);
+    padding:6px 10px; border-radius:6px; cursor:pointer; white-space:nowrap;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{ padding: 76px 0 48px; position:relative; overflow:hidden;}
+  .hero::before{
+    content:''; position:absolute; top:-120px; right:-160px; width:480px; height:480px;
+    background: radial-gradient(circle, var(--orange-tint) 0%, transparent 70%);
+    pointer-events:none; z-index:0;
+  }
+  .hero-grid{display:grid; grid-template-columns: 1.1fr 1fr; gap:56px; align-items:start; position:relative; z-index:1;}
+  .eyebrow{
+    font-family: var(--font-mono); font-size:12px; color: var(--orange);
+    text-transform:uppercase; letter-spacing:0.08em; margin-bottom:16px; font-weight:600;
+    display:flex; align-items:center; gap:8px;
+  }
+  .eyebrow::before{content:''; width:6px; height:6px; border-radius:50%; background:var(--orange); display:inline-block;}
+  h1{
+    font-family: var(--font-display); font-weight:700; font-size:52px; line-height:1.05;
+    letter-spacing:-0.025em; margin-bottom:20px;
+  }
+  h1 .accent{color:var(--orange); position:relative; display:inline-block;}
+  .hero p.sub{ font-size:17px; color: var(--gray-700); max-width: 440px; margin-bottom: 32px;}
+  .trust-row{display:flex; gap:28px; flex-wrap:wrap;}
+  .trust-item{display:flex; flex-direction:column;}
+  .trust-item .n{font-family:var(--font-display); font-weight:700; font-size:24px; color:var(--charcoal);}
+  .trust-item .l{font-size:12px; color:var(--gray-500);}
+
+  .fade-up{opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease;}
+  .fade-up.in{opacity:1; transform:translateY(0);}
+
+  /* ---------- Card (calculator) ---------- */
+  .card{
+    background: var(--paper); border:1px solid var(--gray-200); border-radius:16px;
+    padding:28px; box-shadow: var(--shadow-sm); transition: box-shadow .25s ease, transform .25s ease;
+  }
+  .card.hero-card{box-shadow: var(--shadow-lg); border-color:transparent;}
+  .card h3{font-family:var(--font-display); font-size:18px; margin-bottom:4px;}
+  .card .hint{font-size:13px; color: var(--gray-500); margin-bottom:20px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-size:12px; font-weight:600; color:var(--gray-700); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.03em;}
+  .field select, .field input{
+    width:100%; padding:11px 12px; border:1px solid var(--gray-200); border-radius:8px;
+    font-family: var(--font-body); font-size:14px; background: var(--paper); color: var(--charcoal);
+  }
+  .field select:focus, .field input:focus{outline:2px solid var(--orange); outline-offset:1px; border-color: var(--orange);}
+  .row-2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .btn{
+    width:100%; padding:13px; border:none; border-radius:8px; background: var(--charcoal); color:#fff;
+    font-family: var(--font-body); font-weight:600; font-size:14px; cursor:pointer; transition: background .15s, transform .15s, box-shadow .15s;
+  }
+  .btn:hover{background:#000; transform:translateY(-1px);}
+  .btn.primary{background: var(--orange); box-shadow:0 4px 14px rgba(255,90,31,0.28);}
+  .btn.primary:hover{background:#E5490F; box-shadow:0 6px 18px rgba(255,90,31,0.36);}
+  .btn:disabled{opacity:0.5; cursor:not-allowed;}
+  .btn-outline{
+    background:transparent; border:1px solid var(--gray-200); color:var(--charcoal);
+  }
+  .btn-outline:hover{border-color:var(--charcoal); background:transparent;}
+
+  .result-box{
+    margin-top:18px; padding:16px; background: var(--orange-tint); border-radius:10px;
+    display:none;
+  }
+  .result-box.show{display:block;}
+  .result-price{font-family:var(--font-display); font-size:28px; font-weight:700;}
+  .result-meta{font-size:13px; color:var(--gray-700); margin-top:4px;}
+  .error-box{
+    margin-top:14px; padding:12px 14px; background:#FDEAE5; border:1px solid #F5C4B5;
+    border-radius:8px; font-size:13px; color:#B23A15; display:none;
+  }
+  .error-box.show{display:block;}
+
+  /* ---------- Network (signature section) ---------- */
+  .network-section{background:var(--charcoal); color:#fff; padding:72px 0; position:relative; overflow:hidden;}
+  .network-section .eyebrow{color:var(--orange);}
+  .network-section .eyebrow::before{background:var(--orange);}
+  .network-section h2{font-family:var(--font-display); font-size:30px; margin-bottom:10px; color:#fff;}
+  .network-section p.lead{color:#B5B2A9; margin-bottom:8px; max-width:520px;}
+  .network-legend{display:flex; gap:24px; margin-top:24px; flex-wrap:wrap;}
+  .network-legend .item{display:flex; align-items:center; gap:8px; font-size:12px; color:#B5B2A9;}
+  .network-legend .dot{width:9px; height:9px; border-radius:50%; display:inline-block;}
+  .network-svg-wrap{margin-top:32px;}
+  .net-node-label{font-family:var(--font-body); font-size:11px; fill:#B5B2A9;}
+  .net-node-label.home{fill:#fff; font-weight:600;}
+  .net-pulse{animation: pulseNode 2.4s ease-in-out infinite;}
+  @keyframes pulseNode{
+    0%, 100%{opacity:1;}
+    50%{opacity:0.55;}
+  }
+  .net-flow{stroke-dasharray:4 5; animation: flowDash 1.8s linear infinite;}
+  @keyframes flowDash{ to { stroke-dashoffset:-18; } }
+  @media (prefers-reduced-motion: reduce){
+    .net-pulse, .net-flow{animation:none;}
+  }
+
+  /* ---------- Timeline (real sequence) ---------- */
+  .journey{ padding: 64px 0; background: var(--gray-100); }
+  .journey h2{font-family:var(--font-display); font-size:28px; margin-bottom:8px;}
+  .journey p.lead{color:var(--gray-700); margin-bottom:40px; max-width:520px;}
+  .steps{display:grid; grid-template-columns: repeat(4, 1fr); gap:20px;}
+  .step{position:relative; padding-top:20px; transition:transform .2s ease;}
+  .step:hover{transform:translateY(-3px);}
+  .step .icon-badge{
+    width:40px; height:40px; border-radius:10px; background:var(--paper); border:1px solid var(--gray-200);
+    display:flex; align-items:center; justify-content:center; margin-bottom:14px; box-shadow:var(--shadow-sm);
+  }
+  .step.active .icon-badge{background:var(--orange); border-color:var(--orange);}
+  .step .num{font-family:var(--font-mono); font-size:12px; color: var(--orange); font-weight:600; letter-spacing:0.04em;}
+  .step h4{font-family:var(--font-display); font-size:16px; margin:6px 0 6px;}
+  .step p{font-size:13px; color:var(--gray-700);}
+  .step::before{
+    content:''; position:absolute; top:0; left:0; width:100%; height:2px; background: var(--gray-200);
+  }
+  .step.active::before{background: var(--orange);}
+
+  /* ---------- Two-column section (ship + track) ---------- */
+  .section{padding: 64px 0;}
+  .section h2{font-family:var(--font-display); font-size:26px; margin-bottom:6px;}
+  .section p.lead{color:var(--gray-700); margin-bottom:28px;}
+  .tabs{display:flex; gap:8px; margin-bottom:24px; border-bottom:1px solid var(--gray-200);}
+  .tab{padding:10px 4px; margin-right:20px; font-size:14px; font-weight:600; color:var(--gray-500); cursor:pointer; border-bottom:2px solid transparent;}
+  .tab.active{color:var(--charcoal); border-color: var(--orange);}
+  .panel{display:none;}
+  .panel.active{display:block;}
+  .two-col{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+
+  .auth-strip{display:flex; gap:8px; align-items:center; font-size:13px; margin-bottom:20px; padding:12px 14px; background:var(--gray-100); border-radius:8px;}
+  .auth-strip.logged-in{background: var(--orange-tint);}
+  .auth-strip input{flex:1; padding:8px 10px; border:1px solid var(--gray-200); border-radius:6px; font-size:13px;}
+
+  /* ---------- Shipping label (signature element) ---------- */
+  .label-ticket{
+    background: var(--paper); border: 2px dashed var(--gray-200); border-radius:14px;
+    padding:24px; position:relative; display:none;
+  }
+  .label-ticket.show{display:block;}
+  .label-top{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:18px; padding-bottom:16px; border-bottom:1px dashed var(--gray-200);}
+  .label-resi{font-family:var(--font-mono); font-size:22px; font-weight:600; letter-spacing:0.02em;}
+  .label-status{
+    font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.06em;
+    padding:6px 12px; border-radius:20px; background: var(--charcoal); color:#fff; font-weight:600;
+    transform: rotate(2deg);
+  }
+  .label-status.delivered{background: var(--green);}
+  .timeline-log{display:flex; flex-direction:column; gap:0;}
+  .log-item{display:grid; grid-template-columns:110px 1fr; gap:14px; padding:12px 0; border-bottom:1px solid var(--gray-100);}
+  .log-item:last-child{border-bottom:none;}
+  .log-time{font-family:var(--font-mono); font-size:11px; color:var(--gray-500); padding-top:2px;}
+  .log-status{font-weight:600; font-size:13px;}
+  .log-desc{font-size:12px; color:var(--gray-700); margin-top:2px;}
+
+  footer{background:var(--charcoal); color:#B5B2A9; padding:44px 0 28px;}
+  footer .foot-grid{display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:24px; margin-bottom:28px;}
+  footer .foot-logo{font-family:var(--font-display); font-weight:700; font-size:18px; color:#fff;}
+  footer .foot-logo .dot{color:var(--orange);}
+  footer .foot-tag{font-size:13px; margin-top:6px; max-width:280px;}
+  footer .foot-cities{font-size:12px; font-family:var(--font-mono); text-align:right; line-height:1.8;}
+  footer .foot-bottom{border-top:1px solid var(--charcoal-soft); padding-top:20px; font-size:12px;}
+
+  @media (max-width: 860px){
+    .hero-grid{grid-template-columns:1fr;}
+    .steps{grid-template-columns: repeat(2,1fr); row-gap:28px;}
+    .two-col{grid-template-columns:1fr;}
+    h1{font-size:34px;}
+    nav{display:none;}
+    .trust-row{gap:20px;}
+    footer .foot-grid{flex-direction:column;}
+    footer .foot-cities{text-align:left;}
+  }
+  :focus-visible{outline:2px solid var(--orange); outline-offset:2px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap header-inner">
+    <div class="logo">PUL<span class="dot">•</span>AU</div>
+    <nav>
+      <a href="#cek-ongkir">Cek Ongkir</a>
+      <a href="#kirim-lacak">Kirim Paket</a>
+      <a href="#kirim-lacak">Lacak Paket</a>
+    </nav>
+    <div class="api-toggle" id="apiToggle" title="Klik untuk ubah alamat backend">API: localhost:4000</div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div class="fade-up in">
+      <div class="eyebrow">Ekspedisi Antar Pulau</div>
+      <h1>Setiap pulau,<br>satu <span class="accent">jaringan</span>.</h1>
+      <p class="sub">Berpusat di Nanga Pinoh, menjangkau Kalimantan Barat hingga ke seberang pulau — satu sistem yang sama melacak paketmu dari gudang asal, hub distribusi, sampai ke tangan penerima.</p>
+      <div class="trust-row">
+        <div class="trust-item"><span class="n">9+</span><span class="l">Kota terhubung</span></div>
+        <div class="trust-item"><span class="n">4</span><span class="l">Zona pulau</span></div>
+        <div class="trust-item"><span class="n">24/7</span><span class="l">Lacak real-time</span></div>
+      </div>
+    </div>
+
+    <div class="card hero-card fade-up in" id="cek-ongkir">
+      <h3>Cek Ongkir</h3>
+      <div class="hint">Hitung estimasi biaya kirim dalam hitungan detik</div>
+
+      <div class="row-2">
+        <div class="field">
+          <label for="originCity">Kota Asal</label>
+          <select id="originCity"><option value="">Memuat...</option></select>
+        </div>
+        <div class="field">
+          <label for="destCity">Kota Tujuan</label>
+          <select id="destCity"><option value="">Memuat...</option></select>
+        </div>
+      </div>
+      <div class="row-2">
+        <div class="field">
+          <label for="weight">Berat (kg)</label>
+          <input type="number" id="weight" min="0.1" step="0.1" value="1">
+        </div>
+        <div class="field">
+          <label for="serviceType">Layanan</label>
+          <select id="serviceType">
+            <option value="regular">Regular</option>
+            <option value="express">Express</option>
+            <option value="same_day">Same Day</option>
+            <option value="cargo">Cargo</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn primary" id="btnCalculate">Hitung Ongkir</button>
+
+      <div class="result-box" id="resultBox">
+        <div class="result-price" id="resultPrice">Rp0</div>
+        <div class="result-meta" id="resultMeta"></div>
+      </div>
+      <div class="error-box" id="calcError"></div>
+    </div>
+  </div>
+</section>
+
+<section class="network-section">
+  <div class="wrap">
+    <div class="fade-up">
+      <div class="eyebrow">Jaringan Kami</div>
+      <h2>Dari Nanga Pinoh, ke mana saja.</h2>
+      <p class="lead">Nanga Pinoh sebagai pusat operasi, tersambung ke Pontianak sebagai gerbang keluar-pulau, lalu ke hub nasional yang menjangkau seluruh Indonesia.</p>
+    </div>
+
+    <div class="network-svg-wrap fade-up">
+      <svg viewBox="0 0 900 380" style="width:100%; height:auto;" role="img" aria-label="Peta jaringan hub PUL AU dari Nanga Pinoh ke seluruh Indonesia">
+        <!-- garis koneksi lokal (Nanga Pinoh <-> daerah sekitar) -->
+        <line x1="110" y1="190" x2="170" y2="110" stroke="#4A4844" stroke-width="1.5" opacity="0.5"/>
+        <line x1="110" y1="190" x2="230" y2="160" stroke="#4A4844" stroke-width="1.5" opacity="0.5"/>
+        <line x1="110" y1="190" x2="250" y2="230" stroke="#4A4844" stroke-width="1.5" opacity="0.5"/>
+        <line x1="110" y1="190" x2="60" y2="270" stroke="#4A4844" stroke-width="1.5" opacity="0.5"/>
+        <!-- jalur utama: Nanga Pinoh -> Pontianak -> Jakarta -> Medan/Denpasar -->
+        <line class="net-flow" x1="110" y1="190" x2="180" y2="320" stroke="#FF5A1F" stroke-width="2"/>
+        <line class="net-flow" x1="180" y1="320" x2="460" y2="250" stroke="#FF5A1F" stroke-width="2"/>
+        <line x1="460" y1="250" x2="380" y2="70" stroke="#837F78" stroke-width="1.5" opacity="0.6"/>
+        <line x1="460" y1="250" x2="750" y2="300" stroke="#837F78" stroke-width="1.5" opacity="0.6"/>
+
+        <!-- kota sekitar Melawi -->
+        <circle cx="170" cy="110" r="5" fill="#837F78"/>
+        <text class="net-node-label" x="182" y="108">Sintang</text>
+        <circle cx="230" cy="160" r="5" fill="#837F78"/>
+        <text class="net-node-label" x="242" y="158">Sekadau</text>
+        <circle cx="250" cy="230" r="5" fill="#837F78"/>
+        <text class="net-node-label" x="262" y="234">Sanggau</text>
+        <circle cx="60" cy="270" r="5" fill="#837F78"/>
+        <text class="net-node-label" x="20" y="292">Ketapang</text>
+
+        <!-- Nanga Pinoh: pusat operasi -->
+        <circle class="net-pulse" cx="110" cy="190" r="14" fill="#FF5A1F" opacity="0.2"/>
+        <circle cx="110" cy="190" r="8" fill="#FF5A1F"/>
+        <text class="net-node-label home" x="70" y="215">Nanga Pinoh (Pusat)</text>
+
+        <!-- Pontianak: hub gerbang -->
+        <circle cx="180" cy="320" r="9" fill="#fff"/>
+        <text class="net-node-label home" x="140" y="345">Pontianak</text>
+        <text class="net-node-label" x="140" y="360" font-size="10">Hub Gerbang</text>
+
+        <!-- Jakarta: hub nasional -->
+        <circle cx="460" cy="250" r="11" fill="#fff"/>
+        <text class="net-node-label home" x="420" y="278">Jakarta</text>
+        <text class="net-node-label" x="420" y="292" font-size="10">Hub Nasional</text>
+
+        <circle cx="380" cy="70" r="5" fill="#837F78"/>
+        <text class="net-node-label" x="392" y="68">Medan</text>
+        <circle cx="750" cy="300" r="5" fill="#837F78"/>
+        <text class="net-node-label" x="762" y="298">Denpasar</text>
+      </svg>
+    </div>
+
+    <div class="network-legend fade-up">
+      <div class="item"><span class="dot" style="background:#FF5A1F;"></span>Pusat operasi</div>
+      <div class="item"><span class="dot" style="background:#fff;"></span>Hub distribusi</div>
+      <div class="item"><span class="dot" style="background:#837F78;"></span>Kota terlayani</div>
+    </div>
+  </div>
+</section>
+
+<section class="journey">
+  <div class="wrap">
+    <h2>Perjalanan paketmu</h2>
+    <p class="lead">Urutan sebenarnya yang dilalui setiap paket, dari pelanggan hingga sampai — bukan sekadar ilustrasi.</p>
+    <div class="steps">
+      <div class="step active fade-up">
+        <div class="icon-badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#fff;"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/></svg></div>
+        <div class="num">01</div><h4>Dibuat &amp; dijemput</h4><p>Kurir mengambil paket dari alamat pengirim.</p>
+      </div>
+      <div class="step active fade-up">
+        <div class="icon-badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#fff;"><rect x="3" y="9" width="18" height="11" rx="1"/><path d="M3 9l9-6 9 6"/></svg></div>
+        <div class="num">02</div><h4>Hub asal</h4><p>Paket disortir berdasarkan kota &amp; provinsi tujuan.</p>
+      </div>
+      <div class="step fade-up">
+        <div class="icon-badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--charcoal);"><path d="M5 17h14M5 17a2 2 0 104 0M15 17a2 2 0 104 0M5 17V9h9l4 4v4"/></svg></div>
+        <div class="num">03</div><h4>Transit antar hub</h4><p>Berpindah lewat jalur darat, udara, atau laut sesuai rute.</p>
+      </div>
+      <div class="step fade-up">
+        <div class="icon-badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--charcoal);"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <div class="num">04</div><h4>Diterima</h4><p>Kurir lokal mengantar ke alamat penerima.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="kirim-lacak">
+  <div class="wrap">
+    <h2>Kirim &amp; Lacak</h2>
+    <p class="lead">Buat pengiriman baru atau pantau paket yang sedang berjalan.</p>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="kirim">Buat Pengiriman</div>
+      <div class="tab" data-tab="lacak">Lacak Paket</div>
+    </div>
+
+    <!-- Tab: Kirim -->
+    <div class="panel active" id="panel-kirim">
+      <div class="auth-strip" id="authStrip">
+        <span id="authLabel">Masuk untuk membuat pengiriman:</span>
+        <input type="email" id="authEmail" placeholder="email">
+        <input type="password" id="authPassword" placeholder="password">
+        <button class="btn-outline btn" style="width:auto; padding:8px 14px;" id="btnLogin">Masuk</button>
+        <button class="btn-outline btn" style="width:auto; padding:8px 14px;" id="btnRegister">Daftar</button>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <h3>Pengirim</h3>
+          <div class="field"><label>Nama</label><input id="senderName" placeholder="Nama pengirim"></div>
+          <div class="field"><label>No. HP</label><input id="senderPhone" placeholder="08xxxxxxxxxx"></div>
+          <div class="field"><label>Alamat</label><input id="senderAddress" placeholder="Alamat lengkap"></div>
+          <div class="field"><label>Kota Asal</label><select id="shipOriginCity"><option value="">Memuat...</option></select></div>
+        </div>
+        <div class="card">
+          <h3>Penerima</h3>
+          <div class="field"><label>Nama</label><input id="receiverName" placeholder="Nama penerima"></div>
+          <div class="field"><label>No. HP</label><input id="receiverPhone" placeholder="08xxxxxxxxxx"></div>
+          <div class="field"><label>Alamat</label><input id="receiverAddress" placeholder="Alamat lengkap"></div>
+          <div class="field"><label>Kota Tujuan</label><select id="shipDestCity"><option value="">Memuat...</option></select></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="row-2">
+          <div class="field"><label>Berat (kg)</label><input type="number" id="shipWeight" min="0.1" step="0.1" value="1"></div>
+          <div class="field"><label>Layanan</label>
+            <select id="shipServiceType">
+              <option value="regular">Regular</option>
+              <option value="express">Express</option>
+              <option value="same_day">Same Day</option>
+              <option value="cargo">Cargo</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn primary" id="btnCreateShipment">Buat Pengiriman</button>
+        <div class="error-box" id="shipError"></div>
+      </div>
+    </div>
+
+    <!-- Tab: Lacak -->
+    <div class="panel" id="panel-lacak">
+      <div class="card" style="margin-bottom:20px;">
+        <div class="row-2" style="align-items:end;">
+          <div class="field" style="margin-bottom:0;">
+            <label>Nomor Resi</label>
+            <input id="trackResi" placeholder="Contoh: EKS175201234567890ID">
+          </div>
+          <button class="btn primary" id="btnTrack" style="height:44px;">Lacak Paket</button>
+        </div>
+        <div class="error-box" id="trackError"></div>
+      </div>
+
+      <div class="label-ticket" id="labelTicket">
+        <div class="label-top">
+          <div>
+            <div style="font-size:11px; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">Nomor Resi</div>
+            <div class="label-resi" id="labelResi">—</div>
+          </div>
+          <div class="label-status" id="labelStatus">—</div>
+        </div>
+        <div class="timeline-log" id="timelineLog"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-logo">PUL<span class="dot">•</span>AU</div>
+        <div class="foot-tag">Ekspedisi antar pulau berpusat di Nanga Pinoh, Kalimantan Barat — menjangkau seluruh Indonesia.</div>
+      </div>
+      <div class="foot-cities">
+        Nanga Pinoh · Pontianak · Sintang<br>
+        Sekadau · Sanggau · Ketapang<br>
+        Medan · Jakarta · Denpasar
+      </div>
+    </div>
+    <div class="foot-bottom">PUL•AU — MVP demo, terhubung ke backend ekspedisi-backend/. Data bersifat contoh.</div>
+  </div>
+</footer>
+
+<script>
+  // ---------- State ----------
+  let API_BASE = localStorage.getItem('pulau_api_base') || 'https://pulau.onrender.com/api';
+  let authToken = null;
+  let cities = [];
+
+  const statusLabels = {
+    created: 'Paket Dibuat', picked_up: 'Dijemput Kurir', at_origin_hub: 'Sampai Hub Asal',
+    in_transit: 'Dalam Perjalanan', at_destination_hub: 'Sampai Hub Tujuan',
+    out_for_delivery: 'Sedang Diantar', delivered: 'Diterima', cancelled: 'Dibatalkan', returned: 'Dikembalikan',
+  };
+
+  // ---------- Helpers ----------
+  async function apiFetch(path, options = {}) {
+    const res = await fetch(API_BASE + path, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authToken ? { Authorization: 'Bearer ' + authToken } : {}),
+        ...(options.headers || {}),
+      },
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Terjadi kesalahan, coba lagi.');
+    return data;
+  }
+
+  function showError(elId, message) {
+    const el = document.getElementById(elId);
+    el.textContent = message;
+    el.classList.add('show');
+  }
+  function hideError(elId) {
+    document.getElementById(elId).classList.remove('show');
+  }
+
+  function populateCitySelect(selectEl) {
+    selectEl.innerHTML = cities.map(c =>
+      `<option value="${c.id}">${c.name} — ${c.province_name}</option>`
+    ).join('');
+  }
+
+  async function loadCities() {
+    try {
+      cities = await apiFetch('/cities');
+      ['originCity', 'destCity', 'shipOriginCity', 'shipDestCity'].forEach(id => {
+        populateCitySelect(document.getElementById(id));
+      });
+    } catch (err) {
+      const msg = `<option value="">Tidak bisa memuat kota (${err.message})</option>`;
+      ['originCity', 'destCity', 'shipOriginCity', 'shipDestCity'].forEach(id => {
+        document.getElementById(id).innerHTML = msg;
+      });
+    }
+  }
+
+  // ---------- Ongkir calculator ----------
+  document.getElementById('btnCalculate').addEventListener('click', async () => {
+    hideError('calcError');
+    document.getElementById('resultBox').classList.remove('show');
+    try {
+      const body = {
+        originCityId: Number(document.getElementById('originCity').value),
+        destinationCityId: Number(document.getElementById('destCity').value),
+        weightKg: Number(document.getElementById('weight').value),
+        serviceType: document.getElementById('serviceType').value,
+      };
+      const data = await apiFetch('/shipments/calculate', { method: 'POST', body: JSON.stringify(body) });
+      document.getElementById('resultPrice').textContent = 'Rp' + Number(data.price).toLocaleString('id-ID');
+      document.getElementById('resultMeta').textContent =
+        `Estimasi ${data.estimatedDaysMin}-${data.estimatedDaysMax} hari · ${data.originZone} → ${data.destinationZone} · ${data.billedWeightKg}kg`;
+      document.getElementById('resultBox').classList.add('show');
+    } catch (err) {
+      showError('calcError', err.message);
+    }
+  });
+
+  // ---------- Auth ----------
+  async function doAuth(endpoint) {
+    hideError('shipError');
+    try {
+      const email = document.getElementById('authEmail').value;
+      const password = document.getElementById('authPassword').value;
+      const body = endpoint === '/auth/register'
+        ? { name: email.split('@')[0] || 'Pelanggan', email, password }
+        : { email, password };
+      const data = await apiFetch(endpoint, { method: 'POST', body: JSON.stringify(body) });
+      authToken = data.token;
+      const strip = document.getElementById('authStrip');
+      strip.classList.add('logged-in');
+      document.getElementById('authLabel').textContent = `Masuk sebagai ${data.user.email} —`;
+    } catch (err) {
+      showError('shipError', err.message);
+    }
+  }
+  document.getElementById('btnLogin').addEventListener('click', () => doAuth('/auth/login'));
+  document.getElementById('btnRegister').addEventListener('click', () => doAuth('/auth/register'));
+
+  // ---------- Create shipment ----------
+  document.getElementById('btnCreateShipment').addEventListener('click', async () => {
+    hideError('shipError');
+    if (!authToken) { showError('shipError', 'Masuk atau daftar dulu sebelum membuat pengiriman.'); return; }
+    try {
+      const body = {
+        senderName: document.getElementById('senderName').value,
+        senderPhone: document.getElementById('senderPhone').value,
+        senderAddress: document.getElementById('senderAddress').value,
+        originCityId: Number(document.getElementById('shipOriginCity').value),
+        receiverName: document.getElementById('receiverName').value,
+        receiverPhone: document.getElementById('receiverPhone').value,
+        receiverAddress: document.getElementById('receiverAddress').value,
+        destinationCityId: Number(document.getElementById('shipDestCity').value),
+        weightKg: Number(document.getElementById('shipWeight').value),
+        serviceType: document.getElementById('shipServiceType').value,
+      };
+      const data = await apiFetch('/shipments', { method: 'POST', body: JSON.stringify(body) });
+      // Pindah ke tab lacak dan langsung tampilkan resi baru
+      document.querySelector('.tab[data-tab="lacak"]').click();
+      document.getElementById('trackResi').value = data.shipment.resi_number;
+      document.getElementById('btnTrack').click();
+    } catch (err) {
+      showError('shipError', err.message);
+    }
+  });
+
+  // ---------- Track shipment ----------
+  document.getElementById('btnTrack').addEventListener('click', async () => {
+    hideError('trackError');
+    document.getElementById('labelTicket').classList.remove('show');
+    try {
+      const resi = document.getElementById('trackResi').value.trim();
+      if (!resi) { showError('trackError', 'Masukkan nomor resi terlebih dahulu.'); return; }
+      const data = await apiFetch('/tracking/' + encodeURIComponent(resi));
+
+      document.getElementById('labelResi').textContent = data.resiNumber;
+      const statusEl = document.getElementById('labelStatus');
+      statusEl.textContent = statusLabels[data.currentStatus] || data.currentStatus;
+      statusEl.classList.toggle('delivered', data.currentStatus === 'delivered');
+
+      const logEl = document.getElementById('timelineLog');
+      logEl.innerHTML = data.history.map(h => `
+        <div class="log-item">
+          <div class="log-time">${new Date(h.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}</div>
+          <div>
+            <div class="log-status">${statusLabels[h.status] || h.status}</div>
+            ${h.location_note ? `<div class="log-desc">${h.location_note}</div>` : ''}
+            ${h.description ? `<div class="log-desc">${h.description}</div>` : ''}
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById('labelTicket').classList.add('show');
+    } catch (err) {
+      showError('trackError', err.message);
+    }
+  });
+
+  // ---------- Tabs ----------
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ---------- API base toggle ----------
+  document.getElementById('apiToggle').addEventListener('click', () => {
+    const next = prompt('Alamat backend API:', API_BASE);
+    if (next) {
+      API_BASE = next.replace(/\/$/, '');
+      localStorage.setItem('pulau_api_base', API_BASE);
+      document.getElementById('apiToggle').textContent = 'API: ' + API_BASE.replace(/^https?:\/\//, '');
+      loadCities();
+    }
+  });
+
+  // ---------- Init ----------
+  document.getElementById('apiToggle').textContent = 'API: ' + API_BASE.replace(/^https?:\/\//, '');
+  loadCities();
+
+  // ---------- Scroll reveal ----------
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.fade-up:not(.in)').forEach(el => revealObserver.observe(el));
+</script>
+
+</body>
+</html>
